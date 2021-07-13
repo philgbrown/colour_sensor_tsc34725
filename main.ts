@@ -180,11 +180,11 @@ namespace M_and_M {
     }
 
     /**
-     *  TCS34725: getAllLight - Reporter block that returns the natural light value from the TCS34725 color sensor
+     *  TCS34725: getAllLight - Reporter block that returns the raw or total light value from the TCS34725 color sensor
      */
-    //% block="allLight"
+    //% block="raw"
     //% weight=60 
-    export function getAll(): number {
+    export function getRaw(): number {
         getRGBC();                                                      // Get raw light and colour values
         return Math.round(RGBC_C);                                      // Return clear natural light level
     }
