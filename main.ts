@@ -15,13 +15,22 @@
     * setRange - Set the specified Servo motor output channel to a specified pulse range and servoWrite set the specified servo to the specified angle (0 - 180 degrees).
     * A private initialisation function is provided to initialise the PCA9685 chip, it is called by the first use of the servoWrite function.
     * The initialisation function sets all servo channels to the same default pulse range, currently R700_2400uS. Any call to the setRange function should be done after
-    * a call to servoWrite, otherwise the results of the setRange call will be overwritten by the first use of servoWrite.
+    * a call to servoWrite, otherwise the results of the setRange call will be overwritten by the first use of servoWrite. Subsequent calls to servoWrite will not effect
+    * any data setup by setRange.
+    *
+    * The RC servo motor industry default pulse width of 0.5mS (0deg) to 2.5mS (180deg) does not always function correctly. Any excursions outside this default range will
+    * result in damage to the servo motor. However, some cheaper servo motors struggle to deal with this standard industry range and begin growl, buzz, draw lots of current
+    * and overheat that results in the ultimate failure of the servo motor. This problem mainly occurs at the 0.5mS end of the range. Some servo motors will not extend to 180deg
+    * at 2.5mS and require a maximum pulse width of 2.7mS to reach 180deg. Caution should be exercised if extending the pulse range beyond 2.5mS.
+    * The setRange block will allow each of the 16 servo outputs of the PCA9685 to be individually configured to one of the following six pulse ranges:
+    * 1mS - 2mS, 0.9mS - 2.1mS, 0.8mS - 2.2mS, 0.7mS - 2.3mS, 0.6mS - 2.4mS and 0.5mS - 2.5mS.
+    * The PWM frequency is set to 50Hz making each bit of the PCA9685 4096 count equal to 4.88uS
     * 
     */
     
 //% color="#AA278D" icon="\uf06e"
 namespace M_and_M {
-    /**
+    /*
     * TCS34725: Color sensor register address and control bit definitions 
     */
     const TCS34725_ADDRESS: number = 0x29;          // I2C bus address of TCS34725 sensor (0x39 for TCS34721)
@@ -217,7 +226,9 @@ namespace M_and_M {
         return colour; 
     }
     
-    // PCA9685 address definitions. 
+    /*
+    * PCA9685 register address and control bit definitions 
+    */
     const CHIP_ADDRESS: number = 0x6A;              // Default Chip address
     const REG_MODE1: number = 0x00;                 // Mode 1 register address 
     const REG_MODE2: number = 0x01;                 // Mode 2 register address 
