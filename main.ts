@@ -1,16 +1,26 @@
     /*
-    * This is a MakeCode (pxt) extension for the colour sensor type TCS34725 connected to a micro:bit via the i2c bus. 
-    * The TCS34725 sensor is assumeed to be part of an Adafruit TCS34725 colour sensor board with inbuilt illumination LED. 
-    * Five blocks provide the following data: 
-    * red light component, green light component, blue light component, total light intensity and the colour of a M & M confectionery (0-6).
+    * This is a MakeCode (pxt) extension for the M&M colour sorting machine or Project Recycle.
+    * The extension includes blocks for the colour sensor type TCS34725 and the servo driver type PCA9685 connected to a micro:bit via the i2c bus. 
+    * The TCS34725 sensor is assumed to be an Adafruit TCS34725 colour sensor board with inbuilt illumination LED. I2C bus address = 0x29.
+    * The PCA9685 driver is assummed to be a Kitronix PCA9685 16 channel servo motor driver board. I2C bus address = 0x6A. 
+    *
+    * Five blocks deal with the TCS32725: 
+    * get red light component, get green light component, get blue light component, get total light intensity and get the colour of a M & M confectionery (0-6).
     * The colour component readings are normalised against the total light reading.
-    * Interrupts are disabled in the sensor and no provision is made to control the inbuilt white illumination LED. Refer to Adafruit docs and tutorial for more information. 
-    * The M & M colour block is used in conjunction with a software controlled M & M colour sorting machine and returns a number between 0 and 6. 
+    * Interrupts are disabled in the sensor and no provision is made to control the inbuilt white illumination LED. The illumination LED is permanentlky on.
+    * The M & M colour block returns a number between 0 and 6. Encoding is shown below.
+    * Refer to Adafruit docs and tutorial for more information.
+    * 
+    * Two blocks deal with the PCA9685:
+    * setRange - Set the specified Servo motor output channel to a specified pulse range and servoWrite set the specified servo to the specified angle (0 - 180 degrees).
+    * A private initialisation function is provided to initialise the PCA9685 chip, it is called by the first use of the servoWrite function.
+    * The initialisation function sets all servo channels to the same default pulse range, currently R700_2400uS. Any call to the setRange function should be done after
+    * a call to servoWrite, otherwise the results of the setRange call will be overwritten by the first use of servoWrite.
     * 
     */
     
 //% color="#AA278D" icon="\uf06e"
-namespace TCS34725 {
+namespace M_and_M {
     /**
     * TCS34725: Color sensor register address and control bit definitions 
     */
@@ -280,7 +290,7 @@ namespace TCS34725 {
     //    return pins.i2cReadNumber(addr, NumberFormat.UInt8LE);
     //}
 
-    // Function to map o value from one range into another range 
+    // Function to map a value from one range into another range 
     function map(value: number, fromLow: number, fromHigh: number, toLow: number, toHigh: number): number {
         return ((value - fromLow) * (toHigh - toLow)) / (fromHigh - fromLow) + toLow;
     }
@@ -358,7 +368,7 @@ namespace TCS34725 {
      * @param Servo Which servo to alter the pulse range.
 	 * @param Range The new pulse range for the servo.
      */
-    //% blockId=set_pulse_range
+    //% blockId=I2C_set_pulse_range
     //% block="set%Servo|pulse range%PulseRange"
 	export  function setRange (Servo: Servos, Range: PulseRange): void {
         ServoRange[Servo - 1] = Range;                  // Store new pulse range in servoRange array 
